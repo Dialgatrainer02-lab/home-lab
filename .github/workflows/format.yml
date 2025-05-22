@@ -1,0 +1,38 @@
+name: Format Check
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    name: Run packer fmt and tofu fmt
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@v2
+        with:
+          version: latest
+
+      - name: Run packer fmt
+        run: |
+          echo "Running packer fmt..."
+          packer fmt -check -recursive .
+
+      - name: Set up OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: latest
+
+      - name: Run tofu fmt
+        run: |
+          echo "Running tofu fmt..."
+          tofu fmt -check -recursive
