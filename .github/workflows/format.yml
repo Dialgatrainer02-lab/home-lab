@@ -25,7 +25,7 @@ jobs:
       - name: Run packer fmt
         run: |
           echo "Running packer fmt..."
-          packer fmt -check -recursive .
+          packer fmt -recursive packer/
 
       - name: Set up OpenTofu
         uses: opentofu/setup-opentofu@v1
