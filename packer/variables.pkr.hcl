@@ -1,5 +1,6 @@
 variable "pve_endpoint" {
   type = string
+  default = "https://192.168.0.90:8006/api2/json"
 }
 
 variable "pve_username" {
@@ -12,18 +13,29 @@ variable "pve_password" {
 }
 
 variable "pve_node" {
-  type = string
+  type    = string
   default = "pve"
 }
 
-variable "provision_user" {
-    type = string
-    default = "provision"
+variable "pve_datastore" {
+  type    = string
+  default = "local-zfs"
 }
 
-variable "provision_passwd" {
-    type = string
-    default = "Password1"
-    description = "password for the provision user is not secure and ssh keys should be used"
 
+variable "talos_image" {
+  type = object({
+    arch        = string
+    platform    = string
+    secureboot  = bool
+    factory_url = string
+    version     = string
+  })
+  default = {
+    arch        = "amd64"
+    platform    = "nocloud"
+    secureboot  = false
+    factory_url = "https://factory.talos.dev"
+    version     = "v1.10.2"
+  }
 }

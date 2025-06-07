@@ -11,7 +11,7 @@ on:
 jobs:
   format-check:
     runs-on: ubuntu-latest
-    name: Run packer fmt and tofu fmt
+    name: validate and format
 
     steps:
       - name: Checkout code
@@ -21,18 +21,55 @@ jobs:
         uses: hashicorp/setup-packer@v2
         with:
           version: latest
+      - name: Run packer validate
+        run: |
+          echo "Running packer validate..."
+          packer validate packer/
 
       - name: Run packer fmt
         run: |
           echo "Running packer fmt..."
-          packer fmt -recursive packer/
+          packer fmt -check -recursive packer/
 
       - name: Set up OpenTofu
         uses: opentofu/setup-opentofu@v1
         with:
           tofu_version: latest
 
+      - name: Run tofu validate
+        run: |
+          echo "Running tofu fmt..."
+          tofu validate terraform/
+
       - name: Run tofu fmt
         run: |
           echo "Running tofu fmt..."
-          tofu fmt -check -recursive
+          tofu fmt -check -recursive terraform/
+  tflint:
+    runs-on: ubuntu-latest
+    name: tflint
+
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout source code
+
+    - uses: actions/cache@v4
+      name: Cache plugin dir
+      with:
+        path: ~/.tflint.d/plugins
+        key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+
+    - uses: terraform-linters/setup-tflint@v4
+      name: Setup tflint
+
+    - name: Show version
+      run: tflint --version
+
+    - name: Init TFLint
+      run: tflint --init
+      env:
+        # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Run TFLint
+      run: tflint -f compact --chdir terraform/ --recursive
