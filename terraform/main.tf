@@ -27,7 +27,7 @@ module "talos_cluster" {
   talos_arch             = local.talos_image_data.arch
   talos_schematic_id     = local.latest_talos_build.custom_data.talos_schematic_id
   talos_secureboot       = local.talos_image_data.secureboot
-  talos_cluster_endpoint = "https://192.168.0.97:6443"
+  
   talos_vm_template = {
     vm_id       = local.latest_talos_build.artifact_id
     # source_node = local.latest_talos_build.custom_data.pve_node
@@ -115,4 +115,34 @@ module "talos_cluster" {
       }
     }
   }
+}
+
+resource "kubectl_manifest" "argocd_application" {
+  depends_on = [ module.talos_cluster ]
+  yaml_body = <<YAML
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-repo
+  namespace: argocd  # This is the namespace where Argo CD is installed
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Dialgatrainer02-lab/apps
+    targetRevision: HEAD
+    path: .  # Change this if your manifests are in a subfolder
+
+  destination:
+    server: https://kubernetes.default.svc  # In-cluster
+    namespace: default  # Change if deploying elsewhere
+
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources removed from git
+      selfHeal: true    # Automatically apply changes if cluster drifts from desired state
+    syncOptions:
+      - CreateNamespace=true  # Optional: auto-create target namespace if it doesn't exist
+
+    YAML
 }

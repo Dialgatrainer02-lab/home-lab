@@ -142,10 +142,20 @@ locals {
   worker_config_patch = local.common_patches
 }
 
+
+locals {
+  controlplane_nodes = [for k, v in var.talos_cluster_nodes : k if v.type == "controlplane"]
+
+  controlpane_ips = concat([for n in local.controlplane_nodes: proxmox_virtual_environment_vm.talos_cluster[n].ipv4_addresses[7][0] ],[for n in local.controlplane_nodes: proxmox_virtual_environment_vm.talos_cluster[n].ipv6_addresses[7][0] if !(strcontains(proxmox_virtual_environment_vm.talos_cluster[n].ipv6_addresses[7][0], "fe80")) ])
+  cluster_endpoint = "https://${coalesce(var.talos_cluster_endpoint_ip, local.controlpane_ips... )}:6443"
+}
+
+
+
 data "talos_machine_configuration" "controlplane" {
   cluster_name     = var.talos_cluster_name
   machine_type     = "controlplane"
-  cluster_endpoint = var.talos_cluster_endpoint
+  cluster_endpoint = local.cluster_endpoint
   machine_secrets  = talos_machine_secrets.this.machine_secrets
   talos_version    = var.talos_version
   config_patches   = local.controlplane_config_patch[*]
@@ -154,8 +164,23 @@ data "talos_machine_configuration" "controlplane" {
 data "talos_machine_configuration" "worker" {
   cluster_name     = var.talos_cluster_name
   machine_type     = "worker"
-  cluster_endpoint = var.talos_cluster_endpoint
+  cluster_endpoint = local.cluster_endpoint
   machine_secrets  = talos_machine_secrets.this.machine_secrets
   talos_version    = var.talos_version
   config_patches   = local.worker_config_patch[*]
+}
+
+data "talos_client_configuration" "this" {
+  client_configuration = talos_machine_secrets.this.client_configuration
+  cluster_name = var.talos_cluster_name
+  endpoints = concat(local.controlpane_ips, [var.talos_cluster_endpoint_ip])
+}
+
+
+resource "talos_cluster_kubeconfig" "this" {
+  depends_on = [
+    talos_machine_bootstrap.this
+  ]
+  client_configuration = talos_machine_secrets.this.client_configuration
+  node                 = local.single_controlplane_ip
 }

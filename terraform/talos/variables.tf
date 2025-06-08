@@ -22,8 +22,10 @@ variable "talos_secureboot" {
   default = true
 }
 
-variable "talos_cluster_endpoint" {
+variable "talos_cluster_endpoint_ip" {
   type = string
+  nullable = true
+  default = ""
 }
 
 
@@ -69,15 +71,15 @@ variable "talos_cluster_nodes" {
     }))
     network = object({
       ipv4 = optional(object({
-        cidr = string
-        host = number
-        gw   = string
-      }))
+        cidr = optional(string)
+        host = optional(number)
+        gw   = optional(string)
+      }), {})
       ipv6 = optional(object({
-        cidr = string
-        host = number
-        gw   = string
-      }))
+        cidr = optional(string)
+        host = optional(number)
+        gw   = optional(string)
+      }), {})
       name_servers = optional(list(string), ["1.1.1.1", "8.8.8.8"])
     })
   }))
