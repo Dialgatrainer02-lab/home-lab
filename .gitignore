@@ -1,5 +1,0 @@
-*secrets*
-terraform/.terraform*
-downloaded_iso_path/*
-manifest.json
-*tfstate*
