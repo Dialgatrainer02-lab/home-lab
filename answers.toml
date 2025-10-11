@@ -1,0 +1,24 @@
+
+[global]
+keyboard = "en-us"
+country = "gb"
+fqdn = "pve-0.local"
+mailto = "mail@no.invalid"
+timezone = "Europe/London"
+root-password = "Abc123!!!"
+# root-ssh-keys = [
+    # 
+# ]
+
+[network]
+source = "from-dhcp"
+
+[disk-setup]
+filesystem = "zfs"
+disk-list = ["nvme0n1", "sdb"]
+zfs.raid = "raid1"
+
+
+
+[post-installation-webhook]
+url = "http://192.168.0.27:6000"
