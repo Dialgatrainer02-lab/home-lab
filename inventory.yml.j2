@@ -1,9 +1,0 @@
-hypervisors:
-   hosts:
-     {{ info.fqdn }}:
-     {%- for interface in info.network-interfaces %}
-       {%- if interface.is-management %}
-          ansible_host: {{ interface.address.split('/', 1)[0] }}
-          remove_user: root
-          private_key_file: /secret
-          host_key_checking: "off"
