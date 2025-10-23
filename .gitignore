@@ -1,2 +1,3 @@
 creds.auto.tfvars
 .terraform
+*tfstate*
