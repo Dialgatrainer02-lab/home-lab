@@ -11,6 +11,16 @@ variable "proxmox_vm_metadata" {
     description = "metadata about the vm needed for its creation"
 }
 
+variable "proxmox_vm_user_account" {
+  type = object({
+    username = optional(string)
+    password = optional(string)
+  })
+  default = {
+    username = "test"
+  }
+}
+
 variable "proxmox_vm_cpu" {
     type = object({
       cores = number

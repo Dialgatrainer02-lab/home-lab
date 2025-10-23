@@ -51,6 +51,8 @@ resource "proxmox_virtual_environment_vm" "proxmox_vm" {
     }
 
     user_account {
+      username = var.proxmox_vm_user_account.username
+      password = var.proxmox_vm_user_account.password
       keys     = [trimspace(tls_private_key.proxmox_vm_key.public_key_openssh)]
     }
   }
@@ -131,10 +133,6 @@ locals {
     }]: var.proxmox_vm_network.network_devices
 }
 
-output "name" {
-  value = local.network_devices
-}
-
 resource "proxmox_virtual_environment_download_file" "proxmox_vm_boot_image" {
   content_type = var.proxmox_vm_boot_image.content_type
   datastore_id = local.boot_image_datastore_id
@@ -149,7 +147,6 @@ resource "proxmox_virtual_environment_download_file" "proxmox_vm_boot_image" {
 locals {
   boot_image_datastore_id = var.proxmox_vm_boot_image.datastore_id != null? var.proxmox_vm_boot_image.datastore_id: "local"
 }
-
 
 resource "tls_private_key" "proxmox_vm_key" {
   algorithm = "RSA"
