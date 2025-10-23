@@ -1,4 +1,4 @@
-resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
+resource "proxmox_virtual_environment_vm" "proxmox_vm" {
   # metadata
   name        = var.proxmox_vm_metadata.name
   description = var.proxmox_vm_metadata.description
@@ -51,11 +51,18 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     }
 
     user_account {
-      keys     = [trimspace(tls_private_key.ubuntu_vm_key.public_key_openssh)]
+      keys     = [trimspace(tls_private_key.proxmox_vm_key.public_key_openssh)]
     }
   }
 
 # disks
+
+  disk {
+   import_from = proxmox_virtual_environment_download_file.proxmox_vm_boot_image.id
+   datastore_id = local.local_datastore[local.node_name]
+   interface = "scsi0"
+   size = 20
+ }
 
   dynamic "disk" {
     for_each = toset(var.proxmox_vm_disks)
@@ -73,12 +80,12 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   }
 
   dynamic "network_device" {
-    for_each = var.proxmox_vm_network.network_device == null? toset([{
-      bridge = "vmbr0"
-    }]) : toset(var.proxmox_vm_network.network_device)
+    for_each = local.network_devices
 
     content {
-      bridge = network_device["bridge"]
+      bridge = network_device.value["bridge"]
+      disconnected = network_device.value["disconnected"]
+      firewall = network_device.value["firewall"]
     }
     
   }
@@ -115,24 +122,36 @@ locals {
     stop_on_destroy = !var.proxmox_vm_metadata.agent
 
     node_name = var.proxmox_vm_metadata.node_name == null ? data.proxmox_virtual_environment_nodes.available_nodes.names[0]: var.proxmox_vm_metadata.node_name
+
+    network_devices = var.proxmox_vm_network.network_devices == null? [{
+      bridge = "vmbr0"
+      disconnected = false
+      firewall = false
+
+    }]: var.proxmox_vm_network.network_devices
 }
 
-resource "proxmox_virtual_environment_download_file" "latest_ubuntu_22_jammy_qcow2_img" {
-  content_type = "import"
-  datastore_id = "local"
-  node_name    = "pve"
-  url          = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+output "name" {
+  value = local.network_devices
+}
+
+resource "proxmox_virtual_environment_download_file" "proxmox_vm_boot_image" {
+  content_type = var.proxmox_vm_boot_image.content_type
+  datastore_id = local.boot_image_datastore_id
+  node_name    = local.node_name
+  overwrite = false
+  decompression_algorithm = var.proxmox_vm_boot_image.decompression_algorithm
+  url          = var.proxmox_vm_boot_image.url
   # need to rename the file to *.qcow2 to indicate the actual file format for import
-  file_name = "jammy-server-cloudimg-amd64.qcow2"
+  file_name = var.proxmox_vm_boot_image.file_name
 }
 
-resource "random_password" "ubuntu_vm_password" {
-  length           = 16
-  override_special = "_%@"
-  special          = true
+locals {
+  boot_image_datastore_id = var.proxmox_vm_boot_image.datastore_id != null? var.proxmox_vm_boot_image.datastore_id: "local"
 }
 
-resource "tls_private_key" "ubuntu_vm_key" {
+
+resource "tls_private_key" "proxmox_vm_key" {
   algorithm = "RSA"
   rsa_bits  = 2048
 }

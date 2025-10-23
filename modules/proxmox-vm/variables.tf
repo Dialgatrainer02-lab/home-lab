@@ -50,12 +50,23 @@ variable "proxmox_vm_network" {
           gateway = string
         })
       })
-      network_device = optional(list(object({
+      network_devices = optional(list(object({
         bridge = optional(string, "vmbr0")
         disconnected = optional(bool, false)
         firewall = optional(bool, false)
       })))
     })
+}
+
+variable "proxmox_vm_boot_image" {
+  type = object({
+    url = string
+    file_name = optional(string)
+    datastore_id = optional(string)
+    decompression_algorithm = optional(string)
+    content_type = optional(string, "import")
+  })
+  
 }
 
 variable "proxmox_vm_memory" {
@@ -81,9 +92,3 @@ locals {
     )
   }
 }
-
-output "name" {
-  value = local.local_datastore
-}
-
-

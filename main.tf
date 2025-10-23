@@ -8,6 +8,7 @@ module "test" {
       name = "test"
       description = "test"
       tags = []
+      agent = true
     }
     proxmox_vm_disks = [{
         datastore_id = "local-zfs"
@@ -15,7 +16,7 @@ module "test" {
         interface = "virtio0"
     }]
     proxmox_vm_memory = {
-      dedicated = 1024
+      dedicated = 2048
     }
     proxmox_vm_network = {
       dns = {
@@ -33,5 +34,12 @@ module "test" {
         }
       }
     }
+    proxmox_vm_boot_image = {
+      url = "https://repo.almalinux.org/almalinux/10/cloud/x86_64_v2/images/AlmaLinux-10-GenericCloud-latest.x86_64_v2.qcow2"
+    }
   
+}
+
+output "name" {
+  value = module.test.name
 }
