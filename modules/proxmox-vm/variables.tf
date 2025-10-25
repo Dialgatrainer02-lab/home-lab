@@ -25,6 +25,7 @@ variable "proxmox_vm_cpu" {
     type = object({
       cores = number
       type = optional(string, "host")
+      flags = optional(list(string), [])
     })
     description = "vm cpu info"
 }

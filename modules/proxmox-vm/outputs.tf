@@ -1,4 +1,4 @@
-output "prroxmox_vm_keys" {
+output "proxmox_vm_keys" {
     value = tls_private_key.proxmox_vm_key
 }
 

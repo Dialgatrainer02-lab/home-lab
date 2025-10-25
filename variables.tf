@@ -17,22 +17,22 @@ variable "controlplane_vm_nodes" {
 
 variable "controlplane_vm_spec" {
   type = object({
-    cores = number
+    cores  = number
     memory = number
     disk = object({
-      size = number
+      size         = number
       datastore_id = string
     })
-    ip_config = {
-      ipv4 = {
-        subnet = string
+    ip_config = object({
+      ipv4 = object({
+        subnet  = string
         gateway = string
-      }
-      ipv6 = {
-        subnet = string
+      })
+      ipv6 = object({
+        subnet  = string
         gateway = string
-      }
-    }
+      })
+    })
   })
 }
 
@@ -43,10 +43,11 @@ variable "worker_vm_nodes" {
 
 variable "worker_vm_spec" {
   type = object({
-    cores = number
-    memory = number
+    node_name = optional(string)
+    cores     = number
+    memory    = number
     disk = object({
-      size = number
+      size         = number
       datastore_id = string
     })
   })

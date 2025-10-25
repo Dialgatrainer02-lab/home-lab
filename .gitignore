@@ -1,3 +1,6 @@
 creds.auto.tfvars
-.terraform
+.terraform*
 *tfstate*
+*key*
+inventory.json
+.venv

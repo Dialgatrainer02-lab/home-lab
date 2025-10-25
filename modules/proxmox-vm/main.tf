@@ -24,6 +24,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vm" {
   cpu {
     cores = var.proxmox_vm_cpu.cores
     type  = var.proxmox_vm_cpu.type
+    flags = var.proxmox_vm_cpu.flags
   }
 
 # memory
@@ -39,7 +40,13 @@ resource "proxmox_virtual_environment_vm" "proxmox_vm" {
   initialization {
     datastore_id = local.local_datastore[local.node_name]
 
+    dns {
+      domain = var.proxmox_vm_network.dns.domain
+      servers = var.proxmox_vm_network.dns.servers
+    }
+
     ip_config {
+      
       ipv4 {
         address = var.proxmox_vm_network.ip_config.ipv4.address
         gateway = local.proxmox_vm_network.ip_config.ipv4.gateway
@@ -138,6 +145,7 @@ resource "proxmox_virtual_environment_download_file" "proxmox_vm_boot_image" {
   datastore_id = local.boot_image_datastore_id
   node_name    = local.node_name
   overwrite = false
+  overwrite_unmanaged = true
   decompression_algorithm = var.proxmox_vm_boot_image.decompression_algorithm
   url          = var.proxmox_vm_boot_image.url
   # need to rename the file to *.qcow2 to indicate the actual file format for import
