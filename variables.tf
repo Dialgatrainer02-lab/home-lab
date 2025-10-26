@@ -18,6 +18,7 @@ variable "controlplane_vm_nodes" {
 variable "controlplane_vm_spec" {
   type = object({
     cores  = number
+    node_name = optional(string)
     memory = number
     disk = object({
       size         = number

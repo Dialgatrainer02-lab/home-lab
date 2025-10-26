@@ -68,6 +68,7 @@ module "controlplane" {
     description = "controlplane managed by terraform"
     tags        = ["cluster", "terraform", "controlplane"]
     agent       = true
+    node_name = var.controlplane_vm_spec.node_name
   }
 
   proxmox_vm_user_account = {
@@ -101,13 +102,13 @@ module "controlplane" {
 resource "local_sensitive_file" "controlplane_private_key" {
   for_each = local.controlplane_vm_nodes
   content  = module.controlplane[each.key].proxmox_vm_keys.private_key_openssh
-  filename = "./controlplane_key_${each.key}"
+  filename = "./keys/${each.key}"
 }
 
 resource "local_sensitive_file" "test_public_key" {
   for_each = local.controlplane_vm_nodes
   content  = module.controlplane[each.key].proxmox_vm_keys.public_key_openssh
-  filename = "./controlplane_key_${each.key}.pub"
+  filename = "./keys/${each.key}.pub"
 }
 
 
@@ -179,6 +180,7 @@ resource "local_sensitive_file" "worker_public_key" {
 resource "local_file" "inventory" {
   content = jsonencode(local.inventory)
   filename = "./inventory.json"
+
 }
 
 
