@@ -1,8 +1,8 @@
-controlplane_vm_nodes = ["master0"]
+controlplane_vm_nodes = ["controlplane0"]
 
 controlplane_vm_spec = {
-  cores  = 2
-  memory = 2048
+  cores  = 4
+  memory = 4096
   disk = {
     datastore_id = "local-zfs"
     size         = 34

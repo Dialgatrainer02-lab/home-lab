@@ -1,0 +1,51 @@
+---
+- name: Cluster initalisation
+  when: inventory_hostname == groups['controlplane'][0]
+  block:
+    - name: Init kubeadm
+      ansible.builtin.command:
+        cmd: >
+          sudo kubeadm init
+          --pod-network-cidr={{ k8_cluster_pod_network_cidr }}
+          --control-plane-endpoint={{ k8_cluster_controlplane_endpoint | default(inventory_hostname ~ ':6443') }}
+          --upload-certs
+        creates: /etc/kubernetes/admin.conf
+      run_once: true
+    
+    - name: Create ~/.kube directory
+      ansible.builtin.file:
+        path: /home/{{ ansible_user }}/.kube
+        state: directory
+        mode: "0755"
+    
+    - name: Copy kubeconfig file
+      ansible.builtin.file:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/{{ ansible_user }}/.kube/config
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0755"
+        state: hard
+    
+
+    - name: Cni specific steps
+      ansible.builtin.include_tasks:
+        file: cni/{{ k8_cluster_cni }}.yml
+
+    - name: Copy kubeconfig to host
+      ansible.builtin.fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: ../.kube/config
+        flat: true
+      run_once: true
+
+    - name: Generate token to join worker nodes to cluster
+      ansible.builtin.command: sudo kubeadm token create --print-join-command
+      register: join_node_token
+      changed_when: join_node_token.rc != 0
+
+- name: Controlplane high avalbility
+  when: inventory_hostname != groups['controlplane'][0]
+  block:
+    - name: Add controlplane nodes to cluster
+      ansible.builtin.command: "sudo {{ join_node_token ~ ' --control-plane' }}"

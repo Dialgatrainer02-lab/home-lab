@@ -1,0 +1,14 @@
+---
+- name: Restart containerd
+  ansible.builtin.systemd:
+    name: containerd
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
+- name: Restart kubelet
+  ansible.builtin.systemd:
+    name: kubelet
+    daemon_reload: true
+    state: started
+    enabled: true

@@ -1,2 +1,4 @@
-ansible-core
+ansible
 argcomplete
+kubernetes
+jsonpatch

@@ -1,0 +1,99 @@
+---
+# - name: Wait 300 seconds for port 22
+  # ansible.builtin.wait_for:
+
+    # port: "22"
+    # host: "{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}"
+    # search_regex: OpenSSH
+    # delay: "10"
+    # timeout: "300"
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Add IP to /etc/hosts ### for cluster dns resolution
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[item]['ansible_host'] }} {{ hostvars[item]['inventory_hostname'] }}"
+    state: present
+    backup: true
+  loop: "{{ groups['all'] }}"
+
+- name: Add IPv6 to /etc/hosts ### for cluster dns resolution
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[item]['ipv6_address'] }} {{ hostvars[item]['inventory_hostname'] }}"
+    state: present
+    backup: true
+  loop: "{{ groups['all'] }}"
+
+- name: Include OS-specific installation tasks
+  ansible.builtin.include_tasks:
+    file: "{{ ansible_distribution }}.yml"
+
+- name: Start kubelet
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: kubelet
+    state: "started"
+
+- name: Generate containerd config
+  ansible.builtin.command:
+    cmd: containerd config default
+  register: k8_cluster_containerd_config
+
+
+
+- name: Write config
+  ansible.builtin.copy:
+    content: "{{ k8_cluster_containerd_config.stdout }}"
+    # src: config.toml
+    dest: /etc/containerd/config.toml
+
+- name: Start containerd
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: containerd
+    state: "started"
+
+
+- name: Ensure sysctl params required by setup
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/k8s.conf
+  loop:
+    - { name: 'net.ipv6.conf.all.forwarding', value: '1' }
+    - { name: 'net.ipv4.ip_forward', value: '1' }
+
+
+- name: Put SELinux in permissive mode, logging actions that would be blocked.
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
+
+- name: Controlplane specific steps
+  ansible.builtin.include_tasks:
+    file: Controlplane.playbook.yml
+  when: "'controlplane' in group_names"
+
+- name: Worker specific steps
+  ansible.builtin.include_tasks:
+    file: Worker.playbook.yml
+  when: "'worker' in group_names"
+
+  # - name: Join Worker Nodes to cluster
+  # hosts: workers
+  # become: true
+  # tasks:
+  # - name: Save join token command as variable
+  # ansible.builtin.set_fact:
+  # join_node: "{{ hostvars['controlplane'].join_node_token.stdout_lines[0] }}"
+  #
+  # - name: Add worker nodes to cluster
+  # ansible.builtin.command: "sudo {{ join_node }}"
+  #

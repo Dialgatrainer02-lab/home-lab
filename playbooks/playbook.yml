@@ -1,0 +1,10 @@
+---
+- name: Make  k8 cluster
+  hosts: all
+  become: true
+  tasks:
+    - name: Install cluster
+      ansible.builtin.include_role:
+        name: k8_cluster
+      vars:
+        k8_cluster_k8_ver: v1.34
