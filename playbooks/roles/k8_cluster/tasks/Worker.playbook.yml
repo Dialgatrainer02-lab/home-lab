@@ -3,4 +3,6 @@
     join_node: "{{ hostvars[groups['controlplane'][0]].join_node_token.stdout_lines[0] }}"
   
 - name: Add worker nodes to cluster
-  ansible.builtin.command: "sudo {{ join_node }}"
+  ansible.builtin.command: 
+    cmd: "sudo {{ join_node }}"
+    creates: /etc/kubernetes/kubelet.conf

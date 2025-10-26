@@ -11,50 +11,27 @@
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
 
-- name: Add IP to /etc/hosts ### for cluster dns resolution
-  ansible.builtin.lineinfile:
-    path: /etc/hosts
-    line: "{{ hostvars[item]['ansible_host'] }} {{ hostvars[item]['inventory_hostname'] }}"
-    state: present
-    backup: true
-  loop: "{{ groups['all'] }}"
 
-- name: Add IPv6 to /etc/hosts ### for cluster dns resolution
-  ansible.builtin.lineinfile:
-    path: /etc/hosts
-    line: "{{ hostvars[item]['ipv6_address'] }} {{ hostvars[item]['inventory_hostname'] }}"
-    state: present
-    backup: true
-  loop: "{{ groups['all'] }}"
 
 - name: Include OS-specific installation tasks
   ansible.builtin.include_tasks:
     file: "{{ ansible_distribution }}.yml"
 
-- name: Start kubelet
-  ansible.builtin.systemd_service:
-    enabled: true
-    name: kubelet
-    state: "started"
-
-- name: Generate containerd config
-  ansible.builtin.command:
-    cmd: containerd config default
-  register: k8_cluster_containerd_config
-
 
 
 - name: Write config
   ansible.builtin.copy:
-    content: "{{ k8_cluster_containerd_config.stdout }}"
-    # src: config.toml
+    src: config.toml
     dest: /etc/containerd/config.toml
+  notify:
+    - Restart containerd
 
 - name: Start containerd
   ansible.builtin.systemd_service:
     enabled: true
     name: containerd
     state: "started"
+
 
 
 - name: Ensure sysctl params required by setup
@@ -75,6 +52,14 @@
     policy: targeted
     state: permissive
 
+- name: Reboot nodes
+  ansible.builtin.reboot:
+
+- name: Start kubelet
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: kubelet
+    state: "started"
 
 - name: Controlplane specific steps
   ansible.builtin.include_tasks:
@@ -86,14 +71,9 @@
     file: Worker.playbook.yml
   when: "'worker' in group_names"
 
-  # - name: Join Worker Nodes to cluster
-  # hosts: workers
-  # become: true
-  # tasks:
-  # - name: Save join token command as variable
-  # ansible.builtin.set_fact:
-  # join_node: "{{ hostvars['controlplane'].join_node_token.stdout_lines[0] }}"
-  #
-  # - name: Add worker nodes to cluster
-  # ansible.builtin.command: "sudo {{ join_node }}"
-  #
+
+- name: Get Cluster information
+  kubernetes.core.k8s_cluster_info:
+    kubeconfig: "~{{ ansible_user }}/.kube/config"
+  register: api_status
+  when: inventory_hostname == groups['controlplane'][0]

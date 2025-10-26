@@ -4,3 +4,4 @@ creds.auto.tfvars
 *key*
 inventory.json
 .venv
+.kube

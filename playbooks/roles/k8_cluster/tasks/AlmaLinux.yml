@@ -1,4 +1,22 @@
 ---
+- name: Add IP to /etc/hosts ### for cluster dns resolution
+  ansible.builtin.lineinfile:
+    path: /etc/cloud/templates/hosts.redhat.tmpl
+    line: "{{ hostvars[item]['ansible_host'] }} {{ hostvars[item]['inventory_hostname'] }}"
+    state: present
+    backup: true
+  loop: "{{ groups['all'] }}"
+  notify:
+    - Restart kubelet
+
+- name: Add IPv6 to /etc/hosts ### for cluster dns resolution
+  ansible.builtin.lineinfile:
+    path: /etc/cloud/templates/hosts.redhat.tmpl
+    line: "{{ hostvars[item]['ipv6_address'] }} {{ hostvars[item]['inventory_hostname'] }}"
+    state: present
+    backup: true
+  loop: "{{ groups['all'] }}"
+
 - name: Ensure required packages are installed
   ansible.builtin.dnf:
     name:

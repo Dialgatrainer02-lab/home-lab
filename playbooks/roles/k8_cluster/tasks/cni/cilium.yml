@@ -3,9 +3,10 @@
     name: cilium
     repo_url: https://helm.cilium.io/
     kubeconfig: "~{{ ansible_user }}/.kube/config"
+
 - name: Deploy latest version of cillium
   kubernetes.core.helm:
-    name: test
+    name: cilium
     chart_ref: cilium/cilium
     release_namespace: kube-system
     kubeconfig: "~{{ ansible_user }}/.kube/config"

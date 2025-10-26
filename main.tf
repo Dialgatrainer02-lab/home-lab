@@ -88,7 +88,7 @@ module "controlplane" {
   proxmox_vm_network = {
     dns = {
       domain  = ".Home"
-      servers = ["1.1.1.1", "8.8.8.8"]
+      servers = ["1.1.1.1", "1.0.0.1"]
     }
     ip_config = each.value.ip_config
   }
@@ -152,7 +152,7 @@ module "worker" {
   proxmox_vm_network = {
     dns = {
       domain  = ".Home"
-      servers = ["1.1.1.1", "8.8.8.8"]
+      servers = ["1.1.1.1", "1.0.0.1"]
     }
     ip_config = each.value.ip_config
   }
