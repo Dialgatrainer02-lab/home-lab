@@ -1,6 +1,0 @@
----
-k8_cluster_k8_ver: v1.33
-k8_cluster_pod_network_cidr: 10.244.0.0/16
-# k8_cluster_controlplane_endpoint: null
-k8_cluster_cni: cilium
-k8_cluster_kubeconfig_path: ../.kube/config

@@ -1,0 +1,4 @@
+---
+- name: k8_cluster
+  src: https://github.com/Dialgatrainer02-lab/k8-cluster
+  version: main

@@ -57,7 +57,7 @@ locals {
 
 # scope is to have controlplane and workers deployed and inventory ready for ansible to configure for cluster
 module "controlplane" {
-  source = "./modules/proxmox-vm"
+  source = "git::https://github.com/Dialgatrainer02-lab/proxmox-vm.git"
   for_each = local.controlplane_vm_nodes
 
   proxmox_vm_cpu = {
@@ -121,7 +121,7 @@ resource "local_sensitive_file" "test_public_key" {
 
 
 module "worker" {
-  source = "./modules/proxmox-vm"
+  source = "git::https://github.com/Dialgatrainer02-lab/proxmox-vm.git"
   for_each = local.worker_vm_nodes
 # 
   proxmox_vm_cpu = {
@@ -166,13 +166,13 @@ module "worker" {
 resource "local_sensitive_file" "worker_private_key" {
   for_each = local.worker_vm_nodes
   content  = module.worker[each.key].proxmox_vm_keys.private_key_openssh
-  filename = "./worker_key_${each.key}"
+  filename = "./keys/${each.key}"
 }
 # 
 resource "local_sensitive_file" "worker_public_key" {
   for_each = local.worker_vm_nodes
   content  = module.worker[each.key].proxmox_vm_keys.public_key_openssh
-  filename = "./worker_key_${each.key}.pub"
+  filename = "./keys/${each.key}.pub"
 }
 
 
