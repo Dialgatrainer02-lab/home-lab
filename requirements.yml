@@ -1,4 +1,8 @@
 ---
-- name: k8_cluster
-  src: https://github.com/Dialgatrainer02-lab/k8-cluster
-  version: main
+
+collections:
+  - name: https://github.com/Dialgatrainer02-lab/collection
+    type: git
+    version: '*'
+  - name: devopsarr.sonarr
+  - name: devopsarr.prowlarr

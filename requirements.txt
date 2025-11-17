@@ -2,3 +2,6 @@ ansible
 argcomplete
 kubernetes
 jsonpatch
+
+sonarr-py
+prowlarr-py

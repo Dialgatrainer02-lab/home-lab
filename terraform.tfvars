@@ -1,9 +1,9 @@
-controlplane_vm_nodes = ["controlplane0","controlplane1", "controlplane2"]
+controlplane_vm_nodes = ["controlplane0"]
 
 controlplane_vm_spec = {
   cores  = 4
-  memory = 6148
-  node_name = "pve1"
+  memory = 5042
+  node_name = "pve"
   disk = {
     datastore_id = "local-zfs"
     size         = 34
@@ -20,9 +20,9 @@ controlplane_vm_spec = {
   }
 }
 
-worker_vm_nodes = ["worker0"]
+worker_vm_nodes = ["worker0", "worker1", "worker2"]
 worker_vm_spec = {
-  node_name = "pve"
+  node_name = "pve1"
   cores     = 2
   memory    = 4096
   disk = {

@@ -1,0 +1,27 @@
+---
+- name: Configure sonarr
+  hosts: localhost
+  tasks:
+    - name: Configure prowlarr
+      tags:
+        - prowlarr
+      block:
+        - name: Add sonarr
+          devopsarr.prowlarr.prowlarr_application:
+            name: Sonarr
+            sync_level: disabled
+            config_contract: SonarrSettings
+            implementation: Sonarr
+            fields:
+              - name: prowlarrUrl
+                value: http://prowlarr:9696/prowlarr
+              - name: baseUrl
+                value: http://sonarr:8989/sonarr
+              - name: apiKey
+                value: 3c1cd1ba75e24ff482f2440618d907e3
+              - name: syncCategories
+                value:
+                  - 5000
+                  - 5010
+              - name: syncRejectBlocklistedTorrentHashesWhileGrabbing
+                value: false

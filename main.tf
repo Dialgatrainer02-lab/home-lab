@@ -180,7 +180,6 @@ resource "local_sensitive_file" "worker_public_key" {
 resource "local_file" "inventory" {
   content = jsonencode(local.inventory)
   filename = "./inventory.json"
-
 }
 
 
