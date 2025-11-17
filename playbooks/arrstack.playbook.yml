@@ -6,6 +6,8 @@
       tags:
         - prowlarr
       block:
+        - debug:
+            msg: "{{ ansible_env.SONARR_API_KEY }}"
         - name: Add sonarr
           devopsarr.prowlarr.prowlarr_application:
             name: Sonarr
