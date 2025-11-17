@@ -1,5 +1,5 @@
 ---
-- name: Configure sonarr
+- name: Configure arrstack
   hosts: localhost
   tasks:
     - name: Configure prowlarr
@@ -16,9 +16,9 @@
               - name: prowlarrUrl
                 value: http://prowlarr:9696/prowlarr
               - name: baseUrl
-                value: http://sonarr:8989/sonarr
+                value: "{{ ansible_env.SONARR_URL }}"
               - name: apiKey
-                value: 3c1cd1ba75e24ff482f2440618d907e3
+                value: "{{ ansible_env.SONARR_API_KEY }}"
               - name: syncCategories
                 value:
                   - 5000
