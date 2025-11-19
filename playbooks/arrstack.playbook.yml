@@ -56,6 +56,8 @@
         - name: Update media management
           devopsarr.sonarr.sonarr_media_management:
             chmod_folder: "755"
+            chown_group: ""
+            extra_file_extensions: "srt,info"
             rescan_after_refresh: "always"
             recycle_bin: ""
             file_date: "localAirDate"
@@ -95,6 +97,8 @@
         - name: Update media management
           devopsarr.radarr.radarr_media_management:
             chmod_folder: "755"
+            chown_group: ""
+            extra_file_extensions: "srt,info"
             rescan_after_refresh: "always"
             recycle_bin: ""
             file_date: "cinemas"
