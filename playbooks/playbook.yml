@@ -15,6 +15,3 @@
         disablerepo:
           - docker-ce-stable
           # doesnt like the release ver
-
-
-# next is installing argo

@@ -6,17 +6,15 @@
       tags:
         - prowlarr
       block:
-        - debug:
-            msg: "{{ ansible_env.SONARR_API_KEY }}"
         - name: Add sonarr
           devopsarr.prowlarr.prowlarr_application:
             name: Sonarr
-            sync_level: disabled
+            sync_level: fullSync
             config_contract: SonarrSettings
             implementation: Sonarr
             fields:
               - name: prowlarrUrl
-                value: http://prowlarr:9696/prowlarr
+                value: "{{ ansible_env.PROWLARR_URL }}"
               - name: baseUrl
                 value: "{{ ansible_env.SONARR_URL }}"
               - name: apiKey
@@ -25,5 +23,23 @@
                 value:
                   - 5000
                   - 5010
+              - name: syncRejectBlocklistedTorrentHashesWhileGrabbing
+                value: false
+        - name: Add radarr
+          devopsarr.prowlarr.prowlarr_application:
+            name: Radarr
+            sync_level: fullSync
+            config_contract: RadarrSettings
+            implementation: Radarr
+            fields:
+              - name: prowlarrUrl
+                value: "{{ ansible_env.PROWLARR_URL }}"
+              - name: baseUrl
+                value: "{{ ansible_env.RADARR_URL }}"
+              - name: apiKey
+                value: "{{ ansible_env.RADARR_API_KEY }}"
+              - name: syncCategories
+                value:
+                  - 2000
               - name: syncRejectBlocklistedTorrentHashesWhileGrabbing
                 value: false
