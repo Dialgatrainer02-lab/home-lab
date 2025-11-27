@@ -6,6 +6,53 @@ module "cluster" {
   worker_vm_spec=var.worker_vm_spec
 }
 
+module "unbound" {
+  source = "git::https://github.com/Dialgatrainer02-lab/proxmox-vm.git"
+
+  proxmox_vm_metadata = {
+    agent = true
+    tags = ["dns"]
+    description = "dns server"
+    name = var.dns_vm_spec.name
+  }
+
+  proxmox_vm_boot_image = {
+    url = "https://repo.almalinux.org/almalinux/10/cloud/x86_64_v2/images/AlmaLinux-10-GenericCloud-latest.x86_64_v2.qcow2"
+  }
+  proxmox_vm_cpu = {
+    cores = var.dns_vm_spec.cores
+  }
+  proxmox_vm_disks = [{
+    datastore_id = "local-zfs"
+    file_format = "raw"
+    interface = "virtio0"
+    size = 10
+  }]
+  proxmox_vm_memory = {
+    dedicated = var.dns_vm_spec.memory
+  }
+   proxmox_vm_network = {
+    dns = {
+      domain  = ".Home"
+      servers = ["1.1.1.1", "1.0.0.1"]
+    }
+   
+    ip_config = {
+      ipv4 = {
+        address = "192.168.0.101/24",
+        gateway = "192.168.0.1"
+      },
+      ipv6 = {
+        address = "dhcp"
+        gateway = "hello"
+      }
+    }
+  }
+  proxmox_vm_user_account = {
+    username = var.dns_vm_spec.user
+  }
+}
+
 
 locals {
   inventory = {
@@ -26,8 +73,15 @@ locals {
           ansible_host = module.cluster.workers[worker].ip_config.ipv4[0]
           ansible_ssh_private_key_file = local_sensitive_file.worker_private_key[worker].filename
           ansible_user = module.cluster.username
-          ipv6_address = [for addr in module.cluster.workers[worker].ip_config.ipv6 :
-    addr if !can(regex("^(::|fc|fd|fe8|fe9|fea|feb|ff)", addr))][0]
+        }
+      }
+    }
+    dns = {
+      hosts = {
+        (var.dns_vm_spec.name) = {
+          ansible_host = module.unbound.ip_config.ipv4[0]
+          ansible_ssh_private_key_file = local_sensitive_file.unbound_private_key.filename
+          ansible_user = var.dns_vm_spec.user
         }
       }
     }
@@ -69,4 +123,14 @@ resource "local_sensitive_file" "controlplane_public_key" {
   for_each = toset(var.controlplane_vm_nodes)
   content  = module.cluster.controlplanes[each.key].proxmox_vm_keys.public_key_openssh
   filename = "./keys/${each.key}.pub"
+}
+
+resource "local_sensitive_file" "unbound_private_key" {
+  content = module.unbound.proxmox_vm_keys.private_key_openssh
+  filename = "./keys/${var.dns_vm_spec.name}"
+}
+
+resource "local_sensitive_file" "unbound_public_key" {
+  content  = module.unbound.proxmox_vm_keys.public_key_openssh
+  filename = "./keys/${var.dns_vm_spec.name}.pub"
 }

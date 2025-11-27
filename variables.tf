@@ -53,3 +53,13 @@ variable "worker_vm_spec" {
     })
   })
 }
+
+
+variable "dns_vm_spec" {
+  type = object({
+    cores = number
+    memory = number
+    name = string
+    user = string
+  })
+}

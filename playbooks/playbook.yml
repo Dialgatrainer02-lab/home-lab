@@ -1,8 +1,14 @@
 ---
+- name: Install dns
+  ansible.builtin.import_playbook: dialgatrainer02_lab.homelab.dns.yml
+  tags:
+    - dns
 - name: Install cluster
-  ansible.builtin.import_playbook: dialgatrainer02_lab.kubernetes.cluster.yml
+  ansible.builtin.import_playbook: dialgatrainer02_lab.homelab.cluster.yml
+  tags:
+    - cluster
 - name: Extras
-  hosts: all
+  hosts: controlplane:worker
   become: true
   post_tasks:
     - name: Ensure required packages are installed
