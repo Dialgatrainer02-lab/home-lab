@@ -29,4 +29,4 @@
     - ansible.builtin.debug:
         var: step_config
     - ansible.builtin.debug:
-        msg: "{{ step_config | community.general.json_query('authority') }}"
+        msg: "{{ step_config | from_json | community.general.json_query('authority') }}"
