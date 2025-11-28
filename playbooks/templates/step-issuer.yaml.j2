@@ -7,8 +7,8 @@ spec:
   url: https://step-certificates.default.svc.cluster.local
   caBundle: {{ step_certs['resources'][0]['data']['root_ca.crt'] | b64encode }}
   provisioner:
-    name: {{ step_config['resources'][0]['data']['ca.json'] | community.general.json_query('authority.provisioners[0].name') }}
-    kid: {{ step_config['resources'][0]['data']['ca.json'] | community.general.json_query('authority.provisioners[0].key[0].kid') }}
+    name: {{ step_config['resources'][0]['data']['ca.json'] | from_json | community.general.json_query('authority.provisioners[0].name') }}
+    kid: {{ step_config['resources'][0]['data']['ca.json'] | from_json | community.general.json_query('authority.provisioners[0].key[0].kid') }}
     passwordRef:
       name: step-certificates-provisioner-password
       key: password
