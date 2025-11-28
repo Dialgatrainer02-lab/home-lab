@@ -8,7 +8,7 @@ spec:
   caBundle: {{ step_certs['resources'][0]['data']['root_ca.crt'] | b64encode }}
   provisioner:
     name: {{ step_config | from_json | community.general.json_query('authority.provisioners[0].name') }}
-    kid: {{ step_config | from_json | community.general.json_query('authority.provisioners[0].key[0].kid') }}
+    kid: {{ step_config | from_json | community.general.json_query('authority.provisioners[0]') }}
     passwordRef:
       name: step-certificates-provisioner-password
       key: password
