@@ -26,6 +26,14 @@
     - name: Copy config
       ansible.builtin.set_fact:
         step_config: "{{ step_config_raw['resources'][0]['data']['ca.json'] }}"
+    - ansible.builtin.debug:
+        var: "{{ item }}"
+      loop:
+        - step_certs
+        - step_config
+        - step_config_raw
+    - ansible.builtin.debug:
+        msg: "{{ lookup('template','step-issuer.yaml.j2') }}"
     - name: Install step issuer
       kubernetes.core.k8s:
         definition: "{{ lookup('template','step-issuer.yaml.j2') }}"
