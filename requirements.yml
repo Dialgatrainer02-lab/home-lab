@@ -7,3 +7,4 @@ collections:
   - name: devopsarr.sonarr
   - name: devopsarr.prowlarr
   - name: devopsarr.radarr
+  - name: community.general

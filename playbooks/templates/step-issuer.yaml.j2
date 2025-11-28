@@ -3,13 +3,13 @@ apiVersion: certmanager.step.sm/v1beta1
 kind: StepIssuer
 metadata:
   name: step-issuer
-  namespace: default
+  namespace: {{ sa_namespace }}
 spec:
   url: https://step-certificates.default.svc.cluster.local
   caBundle: {{ step_certs['resources'][0]['data']['root_ca.crt'] | b64encode }}
   provisioner:
-    name: $CA_PROVISIONER_NAME
-    kid: $CA_PROVISIONER_KID
+    name: {{ step_config['resources'][0]['data']['ca.json'] | community.general.json_query('authority.provisioners[0].name') }}
+    kid: {{ step_config['resources'][0]['data']['ca.json'] | community.general.json_query('authority.provisioners[0].key[0].kid') }}
     passwordRef:
       name: step-certificates-provisioner-password
       key: password
