@@ -1,0 +1,18 @@
+- name: Configure step issuer
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Get current namespace from service account
+      ansible.builtin.slurp:
+        src: /var/run/secrets/kubernetes.io/serviceaccount/namespace
+      register: sa_namespace_raw
+    - name: Decode namespace
+      ansible.builtin.set_fact:
+        sa_namespace: "{{ sa_namespace_raw.content | b64decode }}"
+    - name: Read step-certificates-certs ConfigMap using service account token
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: ConfigMap
+        name: step-certificates-certs
+        namespace: "{{ sa_namespace }}"
+      register: certs_configmap
