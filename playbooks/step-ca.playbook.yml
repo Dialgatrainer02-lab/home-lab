@@ -13,14 +13,14 @@
       kubernetes.core.k8s_info:
         api_version: v1
         kind: ConfigMap
-        # name: step-certificates-certs
+        name: certificates-step-certificates-certs
         namespace: "{{ sa_namespace }}"
       register: step_certs
     - name: Read step-certificates-certs ConfigMap 
       kubernetes.core.k8s_info:
         api_version: v1
         kind: ConfigMap
-        name: step-certificates-config
+        name: certificates-step-certificates-config
         namespace: "{{ sa_namespace }}"
       register: step_config
     - ansible.builtin.debug:
@@ -29,3 +29,5 @@
         - step_certs
         - step_config
         - sa_namespace
+    - ansible.builtin.debug:
+        msg: "{{ lookup('template', 'step-issuer.yaml.j2') }}"
