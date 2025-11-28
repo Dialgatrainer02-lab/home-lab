@@ -10,6 +10,6 @@ spec:
     name: {{ step_config | from_json | community.general.json_query('authority.provisioners[0].name') }}
     kid: {{ step_config | from_json | community.general.json_query('authority.provisioners[0].key.kid') }}
     passwordRef:
-      name: step-certificates-provisioner-password
+      name: certificates-step-certificates-provisioner-password
       key: password
       namespace: certificates
