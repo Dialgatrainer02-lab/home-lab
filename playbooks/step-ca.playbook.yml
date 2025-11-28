@@ -28,6 +28,6 @@
         step_config: "{{ step_config_raw['resources'][0]['data']['ca.json'] }}"
     - name: Install step issuer
       kubernetes.core.k8s:
-        definition: "{{ lookup('template','ste-issuer.yaml.j2') }}"
+        definition: "{{ lookup('template','step-issuer.yaml.j2') }}"
         state: present
     

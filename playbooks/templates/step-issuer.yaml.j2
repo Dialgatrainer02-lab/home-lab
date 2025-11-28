@@ -1,9 +1,8 @@
 ---
 apiVersion: certmanager.step.sm/v1beta1
-kind: StepIssuer
+kind: StepClusterIssuer
 metadata:
   name: step-issuer
-  namespace: {{ sa_namespace }}
 spec:
   url: https://step-certificates.default.svc.cluster.local
   caBundle: {{ step_certs['resources'][0]['data']['root_ca.crt'] | b64encode }}
