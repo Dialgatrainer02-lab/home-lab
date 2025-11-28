@@ -24,4 +24,4 @@
         namespace: "{{ sa_namespace }}"
       register: step_config
     - ansible.builtin.debug:
-        msg: "{{ step_config['resources'][0]['data']['ca.json'] }}"
+        msg: "{{ step_config['resources'][0]['data']['ca.json'] | community.general.json_query('authority') }}"
