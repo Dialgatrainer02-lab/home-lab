@@ -9,10 +9,22 @@
     - name: Decode namespace
       ansible.builtin.set_fact:
         sa_namespace: "{{ sa_namespace_raw.content | b64decode }}"
-    - name: Read step-certificates-certs ConfigMap using service account token
+    - name: Read step-certificates-certs ConfigMap 
       kubernetes.core.k8s_info:
         api_version: v1
         kind: ConfigMap
         name: step-certificates-certs
         namespace: "{{ sa_namespace }}"
-      register: certs_configmap
+      register: step_certs
+    - name: Read step-certificates-certs ConfigMap 
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: ConfigMap
+        name: step-certificates-config
+        namespace: "{{ sa_namespace }}"
+      register: step_config
+    - ansible.builtin.debug:
+        var: "{{ item }}"
+      loop:
+        - step_certs
+        - step_config
