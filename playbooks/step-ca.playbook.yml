@@ -22,6 +22,11 @@
         kind: ConfigMap
         name: certificates-step-certificates-config
         namespace: "{{ sa_namespace }}"
-      register: step_config
+      register: step_config_raw
+    - name: Copy config
+      ansible.builtin.set_fact:
+        step_config: "{{ step_config_raw['resources'][0]['data']['ca.json'] }}"
     - ansible.builtin.debug:
-        msg: "{{ step_config['resources'][0]['data']['ca.json'] | community.general.json_query('authority') }}"
+        var: step_config
+    - ansible.builtin.debug:
+        msg: "{{ step_config | community.general.json_query('authority') }}"
