@@ -3,6 +3,8 @@ argcomplete
 kubernetes
 jsonpatch
 
+jmespath
+
 sonarr-py
 prowlarr-py
 radarr-py
