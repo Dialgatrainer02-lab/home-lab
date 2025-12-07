@@ -12,13 +12,11 @@ proxmox sdn setup for the cluster + dns
 
 hostpci and usb passthrough for proxmox-vm
 
-k8_cluster use template to only download image once
-
 make dns an lxc
 
 oracle vm for wireguard
 
-inventory module 
+inventory module
 */
 
 module "unbound" {
