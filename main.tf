@@ -6,6 +6,21 @@ module "cluster" {
   worker_vm_spec=var.worker_vm_spec
 }
 
+/*
+
+proxmox sdn setup for the cluster + dns
+
+hostpci and usb passthrough for proxmox-vm
+
+k8_cluster use template to only download image once
+
+make dns an lxc
+
+oracle vm for wireguard
+
+inventory module 
+*/
+
 module "unbound" {
   source = "git::https://github.com/Dialgatrainer02-lab/proxmox-vm.git"
 
