@@ -1,8 +1,7 @@
-# terraform 
-to provision clusters with talos
-# ansible 
-non k8 config manegment
-# argo cd
-cluster manegement
-# distrobuilder 
-any extra lxcs
+# To do list
+
+- proxmox sdn setup for the cluster + dns
+- hostpci and usb passthrough for proxmox-vm
+- make proxmox-lxc module for dns
+- oracle vm for wireguard
+- ansible inventory module
