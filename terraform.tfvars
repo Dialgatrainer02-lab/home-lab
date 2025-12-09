@@ -45,5 +45,5 @@ dns_vm_spec = {
   cores = 2
   memory = 2048
   name = "dns0"
-  user = "dns_admin"
+  user = "root"
 }

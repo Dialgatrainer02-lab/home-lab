@@ -5,5 +5,9 @@ terraform {
       source = "bpg/proxmox"
       version = "0.88.0"
     }
+    oci = {
+      source = "oracle/oci"
+      version = "7.27.0"
+    }
   }
 }

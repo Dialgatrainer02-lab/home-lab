@@ -1,15 +1,3 @@
-variable "pve_endpoint" {
-  type = string
-}
-
-variable "pve_username" {
-  type = string
-}
-
-variable "pve_password" {
-  type = string
-}
-
 
 variable "controlplane_vm_nodes" {
   type = list(string)
@@ -37,6 +25,10 @@ variable "controlplane_vm_spec" {
   })
 }
 
+variable "dns_lxc_template_path" {
+  default = ".output/rootfs.tar.xz"
+  
+}
 
 variable "worker_vm_nodes" {
   type = list(string)

@@ -6,35 +6,48 @@ module "cluster" {
   worker_vm_spec=var.worker_vm_spec
 }
 
+# module "vpn" {
+  # source = "git::https://github.com/Dialgatrainer02-lab/oracle-vm.git"
+  # compartment_ocid = var.compartment_ocid
+  # availability_domain = 1
+# }
 
-module "unbound" {
-  source = "git::https://github.com/Dialgatrainer02-lab/proxmox-vm.git"
+resource "proxmox_virtual_environment_file" "dns_container_template" {
+  content_type = "vztmpl"
+  datastore_id = "local"
+  node_name    = "pve"
 
-  proxmox_vm_metadata = {
-    agent = true
-    tags = ["dns"]
+  source_file {
+    path = var.dns_lxc_template_path
+  }
+}
+
+module "dns" {
+  source = "git::https://github.com/Dialgatrainer02-lab/proxmox-lxc.git"
+
+  proxmox_lxc_metadata = {
+    tags = ["dns", "terraform"]
     description = "dns server"
     name = var.dns_vm_spec.name
+    type = "centos"
   }
 
-  proxmox_vm_boot_image = {
-    url = "https://repo.almalinux.org/almalinux/10/cloud/x86_64_v2/images/AlmaLinux-10-GenericCloud-latest.x86_64_v2.qcow2"
+  proxmox_lxc_template = {
+    id = proxmox_virtual_environment_file.dns_container_template.id
   }
-  proxmox_vm_cpu = {
+  proxmox_lxc_cpu = {
     cores = var.dns_vm_spec.cores
   }
-  proxmox_vm_disks = [{
+  proxmox_lxc_disks = [{
     datastore_id = "local-zfs"
-    file_format = "raw"
-    interface = "virtio0"
     size = 10
   }]
-  proxmox_vm_memory = {
+  proxmox_lxc_memory = {
     dedicated = var.dns_vm_spec.memory
   }
-   proxmox_vm_network = {
+   proxmox_lxc_network = {
     dns = {
-      domain  = ".Home"
+      domain  = "Home"
       servers = ["1.1.1.1", "1.0.0.1"]
     }
    
@@ -49,10 +62,54 @@ module "unbound" {
       }
     }
   }
-  proxmox_vm_user_account = {
-    username = var.dns_vm_spec.user
-  }
 }
+
+# module "dns" {
+  # source = "git::https://github.com/Dialgatrainer02-lab/proxmox-vm.git"
+# 
+  # proxmox_vm_metadata = {
+    # agent = true
+    # tags = ["dns"]
+    # description = "dns server"
+    # name = var.dns_vm_spec.name
+  # }
+# 
+  # proxmox_vm_boot_image = {
+    # url = "https://repo.almalinux.org/almalinux/10/cloud/x86_64_v2/images/AlmaLinux-10-GenericCloud-latest.x86_64_v2.qcow2"
+  # }
+  # proxmox_vm_cpu = {
+    # cores = var.dns_vm_spec.cores
+  # }
+  # proxmox_vm_disks = [{
+    # datastore_id = "local-zfs"
+    # file_format = "raw"
+    # interface = "virtio0"
+    # size = 10
+  # }]
+  # proxmox_vm_memory = {
+    # dedicated = var.dns_vm_spec.memory
+  # }
+  #  proxmox_vm_network = {
+    # dns = {
+      # domain  = ".Home"
+      # servers = ["1.1.1.1", "1.0.0.1"]
+    # }
+  #  
+    # ip_config = {
+      # ipv4 = {
+        # address = "192.168.0.101/24",
+        # gateway = "192.168.0.1"
+      # },
+      # ipv6 = {
+        # address = "dhcp"
+        # gateway = "hello"
+      # }
+    # }
+  # }
+  # proxmox_vm_user_account = {
+    # username = var.dns_vm_spec.user
+  # }
+# }
 
 
 locals {
@@ -80,8 +137,8 @@ locals {
     dns = {
       hosts = {
         (var.dns_vm_spec.name) = {
-          ansible_host = module.unbound.ip_config.ipv4[0]
-          ansible_ssh_private_key_file = local_sensitive_file.unbound_private_key.filename
+          ansible_host = module.dns.ip_config.ipv4[0]
+          ansible_ssh_private_key_file = local_sensitive_file.dns_private_key.filename
           ansible_user = var.dns_vm_spec.user
         }
       }
@@ -126,12 +183,14 @@ resource "local_sensitive_file" "controlplane_public_key" {
   filename = "./keys/${each.key}.pub"
 }
 
-resource "local_sensitive_file" "unbound_private_key" {
-  content = module.unbound.proxmox_vm_keys.private_key_openssh
+resource "local_sensitive_file" "dns_private_key" {
+  content = module.dns.proxmox_lxc_keys.private_key_openssh
+  # content = module.dns.proxmox_vm_keys.private_key_openssh
   filename = "./keys/${var.dns_vm_spec.name}"
 }
 
-resource "local_sensitive_file" "unbound_public_key" {
-  content  = module.unbound.proxmox_vm_keys.public_key_openssh
+resource "local_sensitive_file" "dns_public_key" {
+  content  = module.dns.proxmox_lxc_keys.public_key_openssh
+  # content  = module.dns.proxmox_vm_keys.public_key_openssh
   filename = "./keys/${var.dns_vm_spec.name}.pub"
 }

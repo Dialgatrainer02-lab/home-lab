@@ -5,3 +5,4 @@
 - make proxmox-lxc module for dns
 - oracle vm for wireguard
 - ansible inventory module
+- ntp server

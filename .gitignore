@@ -5,3 +5,4 @@ creds.auto.tfvars
 inventory.json
 .venv
 .kube
+.output
