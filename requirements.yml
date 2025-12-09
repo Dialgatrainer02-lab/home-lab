@@ -4,7 +4,3 @@ collections:
   - name: https://github.com/Dialgatrainer02-lab/collection
     type: git
     version: '*'
-  - name: devopsarr.sonarr
-  - name: devopsarr.prowlarr
-  - name: devopsarr.radarr
-  - name: community.general

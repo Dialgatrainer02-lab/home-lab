@@ -1,8 +1,8 @@
 controlplane_vm_nodes = ["controlplane0"]
 
 controlplane_vm_spec = {
-  cores  = 4
-  memory = 5042
+  cores     = 4
+  memory    = 5042
   node_name = "pve"
   disk = {
     datastore_id = "local-zfs"
@@ -42,8 +42,18 @@ worker_vm_spec = {
 }
 
 dns_vm_spec = {
-  cores = 2
+  cores  = 2
   memory = 2048
-  name = "dns0"
-  user = "root"
+  name   = "dns0"
+  user   = "root"
+  ip_config = {
+    ipv4 = {
+      address = "192.168.0.101/24",
+      gateway = "192.168.0.1"
+    },
+    ipv6 = {
+      address = "dhcp"
+      gateway = "hello"
+    }
+  }
 }

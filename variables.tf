@@ -53,5 +53,15 @@ variable "dns_vm_spec" {
     memory = number
     name = string
     user = string
+    ip_config = object({
+        ipv4 = object({
+          address = string
+          gateway = string
+        })
+        ipv6 = object({
+          address = string
+          gateway = string
+        })
+      })
   })
 }

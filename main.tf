@@ -50,20 +50,10 @@ module "dns" {
       domain  = "Home"
       servers = ["1.1.1.1", "1.0.0.1"]
     }
-   
-    ip_config = {
-      ipv4 = {
-        address = "192.168.0.101/24",
-        gateway = "192.168.0.1"
-      },
-      ipv6 = {
-        address = "dhcp"
-        gateway = "hello"
-      }
-    }
+   ip_config = var.dns_vm_spec.ip_config
+    
   }
 }
-
 # module "dns" {
   # source = "git::https://github.com/Dialgatrainer02-lab/proxmox-vm.git"
 # 
@@ -137,7 +127,7 @@ locals {
     dns = {
       hosts = {
         (var.dns_vm_spec.name) = {
-          ansible_host = module.dns.ip_config.ipv4[0]
+          ansible_host = split("/",var.dns_vm_spec.ip_config.ipv4.address)[0]
           ansible_ssh_private_key_file = local_sensitive_file.dns_private_key.filename
           ansible_user = var.dns_vm_spec.user
         }
