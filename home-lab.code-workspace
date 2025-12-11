@@ -12,17 +12,17 @@
 			"name": "collection",
 			"path": "../personal/collection"
 		},
-        {
-            "name": "k8s-cluster",
-            "path": "../personal/k8s-cluster"
-        },
-        {
-            "name": "proxmox-vm",
-            "path": "../personal/proxmox-vm"
-        },
-        {
-            "name": "proxmox-lxc",
-            "path": "../personal/proxmox-lxc"
-        }
+		{
+			"name": "k8s-cluster",
+			"path": "../personal/k8s-cluster"
+		},
+		{
+			"name": "proxmox-vm",
+			"path": "../personal/proxmox-vm"
+		},
+		{
+			"name": "proxmox-lxc",
+			"path": "../personal/proxmox-lxc"
+		}
 	]
 }
