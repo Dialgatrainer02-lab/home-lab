@@ -5,3 +5,4 @@
 - oracle vm for wireguard
 - ansible inventory module
 - ntp server
+- registry lxc for helm charts images etc
